@@ -1,0 +1,29 @@
+{
+  "version": "0.1.0",
+  "skills": [
+    {
+      "id": "daily-brief",
+      "name": "Daily Brief",
+      "description": "Morning summary of calendar, inbox, top tasks",
+      "promptTemplate": "Summarize today for Kapil: calendar, inbox, top tasks. Context: {{context}}",
+      "allowedTools": ["fs.read", "browser.search"],
+      "modelSpec": ["openai:gpt-4o-mini", "openrouter:anthropic/claude-3.5-sonnet"]
+    },
+    {
+      "id": "repo-doctor",
+      "name": "Repo Doctor",
+      "description": "Quick health check on the workspace",
+      "promptTemplate": "Analyze the repository at {{workspace}}. Run safe checks and summarize findings. Context: {{context}}",
+      "allowedTools": ["terminal.exec", "fs.read", "fs.search"],
+      "modelSpec": ["openai:gpt-4o", "openrouter:anthropic/claude-3.5-sonnet"]
+    },
+    {
+      "id": "inbox-triage",
+      "name": "Inbox Triage",
+      "description": "Categorize and prioritize incoming items",
+      "promptTemplate": "Triage the following items and label each: {{items}}. Output JSON array with {item, priority: high|medium|low, tag}.",
+      "allowedTools": ["fs.read", "memory.get"],
+      "modelSpec": ["openai:gpt-4o-mini"]
+    }
+  ]
+}

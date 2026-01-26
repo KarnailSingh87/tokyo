@@ -1,0 +1,19 @@
+{
+  "version": "0.1.0",
+  "note": "prices are USD per 1M tokens, estimates only for the cost dashboard",
+  "usdPerMTokens": {
+    "input": {
+      "gpt-4o-mini": 0.15,
+      "gpt-4o": 2.5,
+      "anthropic/claude-3.5-sonnet": 3.0,
+      "perplexity/sonar-pro": 3.0
+    },
+    "output": {
+      "gpt-4o-mini": 0.6,
+      "gpt-4o": 10.0,
+      "anthropic/claude-3.5-sonnet": 15.0,
+      "perplexity/sonar-pro": 15.0
+    }
+  },
+  "unknownModelFallback": { "input": 1.0, "output": 2.0 }
+}

@@ -1,0 +1,5 @@
+{
+  "version": "0.1.0",
+  "usdPerMTokens": { "input": { "gpt-4o-mini": 0.15, "gpt-4o": 2.5 }, "output": { "gpt-4o-mini": 0.6, "gpt-4o": 10.0 } },
+  "unknownModelFallback": { "input": 1.0, "output": 2.0 }
+}

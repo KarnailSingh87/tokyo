@@ -1,0 +1,70 @@
+{
+  "version": "0.1.0",
+  "defaultVerdict": "CONFIRM",
+  "rules": [
+    {
+      "id": "deny-dangerous-terminal",
+      "priority": 90,
+      "verdict": "DENY",
+      "reason": "matches destructive command pattern",
+      "categories": ["terminal"],
+      "argRegex": { "arg": "command", "pattern": "(rm\\s+-rf\\s+/(?:\\s|$)|sudo\\s+rm\\b|mkfs|dd\\s+if=.*of=/dev/|shutdown\\b|reboot\\b)" }
+    },
+    {
+      "id": "allow-read-only-fs",
+      "priority": 60,
+      "verdict": "ALLOW",
+      "reason": "read-only filesystem access inside workspace",
+      "tools": ["fs.read", "fs.search"]
+    },
+    {
+      "id": "confirm-screen-access",
+      "priority": 55,
+      "verdict": "CONFIRM",
+      "reason": "screen access requires explicit approval",
+      "categories": ["screen"]
+    },
+    {
+      "id": "confirm-fs-mutations",
+      "priority": 50,
+      "verdict": "CONFIRM",
+      "reason": "filesystem mutations require confirmation",
+      "tools": ["fs.write", "fs.move", "fs.delete"]
+    },
+    {
+      "id": "confirm-terminal",
+      "priority": 40,
+      "verdict": "CONFIRM",
+      "reason": "shell execution requires confirmation",
+      "categories": ["terminal"]
+    },
+    {
+      "id": "confirm-browser",
+      "priority": 40,
+      "verdict": "CONFIRM",
+      "reason": "browser automation requires confirmation",
+      "categories": ["browser"]
+    },
+    {
+      "id": "confirm-network-send",
+      "priority": 40,
+      "verdict": "CONFIRM",
+      "reason": "outbound notifications require confirmation",
+      "tools": ["notify.send"]
+    },
+    {
+      "id": "allow-voice-io",
+      "priority": 35,
+      "verdict": "ALLOW",
+      "reason": "voice input/output is low risk",
+      "tools": ["voice.stt", "voice.tts"]
+    },
+    {
+      "id": "allow-memory",
+      "priority": 35,
+      "verdict": "ALLOW",
+      "reason": "internal memory operations are sandboxed",
+      "tools": ["memory.get", "memory.set"]
+    }
+  ]
+}

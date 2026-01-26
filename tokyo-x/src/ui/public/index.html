@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>TOKYO-X // Orchestrator Core</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='6' fill='%2300e0ff'/%3E%3C/svg%3E" />
+<link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+<div id="app">
+  <header id="topbar">
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <div class="brand-text">
+        <h1>TOKYO-X</h1>
+        <span class="brand-sub">ORCHESTRATOR CORE · KAPIL PRIME</span>
+      </div>
+    </div>
+    <div class="top-right">
+      <span id="clock" class="mono">--:--:--</span>
+      <span class="pill pill-ok">ONLINE</span>
+    </div>
+  </header>
+
+  <main id="grid">
+    <aside class="col col-left">
+      <section class="panel">
+        <h2>System Core</h2>
+        <div class="gauge">
+          <label>CPU</label>
+          <div class="gauge-track"><div class="gauge-fill" id="g-cpu"></div></div>
+          <span class="mono gauge-val" id="v-cpu">0%</span>
+        </div>
+        <div class="gauge">
+          <label>MEM</label>
+          <div class="gauge-track"><div class="gauge-fill" id="g-mem"></div></div>
+          <span class="mono gauge-val" id="v-mem">0%</span>
+        </div>
+        <div class="gauge">
+          <label>NET</label>
+          <div class="gauge-track"><div class="gauge-fill" id="g-net"></div></div>
+          <span class="mono gauge-val" id="v-net">0%</span>
+        </div>
+      </section>
+
+      <section class="panel panel-grow">
+        <h2>Agent Hierarchy</h2>
+        <div id="org-tree" class="org-tree"><p class="muted note">syncing org…</p></div>
+      </section>
+
+      <section class="panel">
+        <h2>Voice Link</h2>
+        <button id="mic-btn" class="btn btn-mic" type="button">ENGAGE MIC</button>
+        <div id="wave" class="wave"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <label class="field">
+          <span>TTS PRESET</span>
+          <select id="voice-preset">
+            <option>Nova</option>
+            <option>Atlas</option>
+            <option>Sage</option>
+            <option>Echo</option>
+            <option>Onyx</option>
+          </select>
+        </label>
+        <button id="speak-btn" class="btn" type="button" style="width:100%;margin-top:8px">SPEAK LAST</button>
+        <p class="note muted">STT placeholder · ElevenLabs presets land Phase 3</p>
+      </section>
+    </aside>
+
+    <section class="col col-center">
+      <div id="orb-stage">
+        <div id="orb" class="orb state-idle">
+          <div class="orb-ring r1"></div>
+          <div class="orb-ring r2"></div>
+          <div class="orb-sweep"></div>
+          <div class="orb-core"></div>
+        </div>
+        <div id="orb-state" class="orb-state mono">IDLE</div>
+        <div id="eq" class="eq"><i></i><i></i><i></i><i></i><i></i></div>
+      </div>
+
+      <section class="panel panel-console">
+        <h2>Command Console</h2>
+        <div id="feed" class="feed"></div>
+        <form id="cmd-form" class="cmd-row">
+          <input id="cmd-input" autocomplete="off" spellcheck="false" placeholder="Type a directive for TOKYO-X…" />
+          <button class="btn btn-primary" type="submit">SEND</button>
+        </form>
+      </section>
+    </section>
+
+    <aside class="col col-right">
+      <section class="panel">
+        <h2>Task Queue</h2>
+        <div id="tasks" class="tasks"></div>
+      </section>
+
+      <section class="panel">
+        <h2>Approvals <span id="approval-count" class="badge">0</span></h2>
+        <div id="approvals" class="approvals"><p class="muted note">inbox clear</p></div>
+      </section>
+
+      <section class="panel">
+        <h2>Cost Meter</h2>
+        <div id="cost-total" class="cost-total mono">$0.0000</div>
+        <div class="cost-row"><span>OpenAI</span><span class="mono" id="cost-openai">$0.0000</span></div>
+        <div class="cost-row"><span>OpenRouter</span><span class="mono" id="cost-openrouter">$0.0000</span></div>
+        <div class="cost-row"><span>ElevenLabs</span><span class="mono" id="cost-elevenlabs">$0.0000</span></div>
+      </section>
+    </aside>
+  </main>
+
+  <footer id="bottombar">
+    <button id="tg-proactive" class="toggle" type="button">PROACTIVE <b>OFF</b></button>
+    <button id="tg-sim" class="toggle on" type="button">SIMULATION <b>ON</b></button>
+    <span id="pair-code" class="mono muted"></span>
+    <div id="audit-line" class="mono muted">audit stream standby…</div>
+    <span class="mono muted version">TOKYO-X v0.1.0 · PHASE 8 UI</span>
+  </footer>
+</div>
+
+<div id="toasts"></div>
+<script src="/app.js"></script>
+</body>
+</html>

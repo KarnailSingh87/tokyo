@@ -1,0 +1,15 @@
+{
+  "version": "0.1.0",
+  "ceo": { "name": "Kapil", "role": "CEO" },
+  "orchestrator": { "id": "tokyo-x", "role": "Orchestrator", "modelDefault": "openai:gpt-4o-mini" },
+  "managers": [
+    { "id": "mgr.research", "name": "Research Manager", "domain": "research", "defaultModel": "openrouter:perplexity/sonar-pro", "maxRiskTier": 1,
+      "workers": [{"id": "w.web", "name": "Web Researcher", "tools": ["browser.search", "browser.open"], "maxRiskTier": 1}] },
+    { "id": "mgr.code", "name": "Code Manager", "domain": "engineering", "defaultModel": "openai:gpt-4o", "maxRiskTier": 2,
+      "workers": [{"id": "w.coder", "name": "Coder", "tools": ["fs.read", "fs.write"], "maxRiskTier": 1}] },
+    { "id": "mgr.pcops", "name": "PC Ops Manager", "domain": "local-machine", "defaultModel": "openai:gpt-4o-mini", "maxRiskTier": 2,
+      "workers": [{"id": "w.files", "name": "File Worker", "tools": ["fs.read", "fs.write", "fs.delete"], "maxRiskTier": 1}] },
+    { "id": "mgr.memory", "name": "Memory Manager", "domain": "memory", "defaultModel": "openai:gpt-4o-mini", "maxRiskTier": 0,
+      "workers": [{"id": "w.twin", "name": "Memory Curator", "tools": ["memory.get", "memory.set"], "maxRiskTier": 0}] }
+  ]
+}

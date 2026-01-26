@@ -1,0 +1,6 @@
+{
+  "version": "0.1.0",
+  "skills": [
+    { "id": "repo-doctor", "name": "Repo Doctor", "description": "Health check", "promptTemplate": "Analyze repo at {{workspace}}. Context: {{context}}", "allowedTools": ["terminal.exec", "fs.read"], "modelSpec": ["openai:gpt-4o"] }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "name": "TOKYO-X Remote",
+  "short_name": "TOKYO-X",
+  "start_url": "/phone/",
+  "display": "standalone",
+  "background_color": "#04070d",
+  "theme_color": "#00e0ff",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

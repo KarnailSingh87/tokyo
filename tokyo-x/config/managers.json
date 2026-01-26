@@ -1,0 +1,77 @@
+{
+  "version": "0.1.0",
+  "ceo": {
+    "name": "Kapil",
+    "role": "CEO",
+    "approvalRights": ["final-approval", "spend-limits", "tier-2-and-3-actions", "policy-changes"]
+  },
+  "orchestrator": {
+    "id": "tokyo-x",
+    "role": "Orchestrator",
+    "modelDefault": "openai:gpt-4o-mini",
+    "fallbackModels": ["openrouter:anthropic/claude-3.5-sonnet"],
+    "escalatesTo": "ceo",
+    "responsibilities": ["decompose goals", "delegate to managers", "verify results", "enforce permission engine"]
+  },
+  "managers": [
+    {
+      "id": "mgr.research",
+      "name": "Research Manager",
+      "domain": "research",
+      "defaultModel": "openrouter:perplexity/sonar-pro",
+      "maxRiskTier": 1,
+      "workers": [
+        { "id": "w.web-researcher", "name": "Web Researcher", "tools": ["browser.search", "browser.open"], "maxRiskTier": 1 },
+        { "id": "w.doc-reader", "name": "Doc Reader", "tools": ["fs.read", "fs.search"], "maxRiskTier": 0 },
+        { "id": "w.summarizer", "name": "Summarizer", "tools": [], "maxRiskTier": 0 }
+      ]
+    },
+    {
+      "id": "mgr.code",
+      "name": "Code Manager",
+      "domain": "engineering",
+      "defaultModel": "openai:gpt-4o",
+      "maxRiskTier": 2,
+      "workers": [
+        { "id": "w.coder", "name": "Coder", "tools": ["fs.read", "fs.write", "fs.search"], "maxRiskTier": 1 },
+        { "id": "w.reviewer", "name": "Reviewer", "tools": ["fs.read"], "maxRiskTier": 0 },
+        { "id": "w.tester", "name": "Tester", "tools": ["terminal.exec", "fs.read"], "maxRiskTier": 2 }
+      ]
+    },
+    {
+      "id": "mgr.pcops",
+      "name": "PC Ops Manager",
+      "domain": "local-machine",
+      "defaultModel": "openai:gpt-4o-mini",
+      "maxRiskTier": 2,
+      "workers": [
+        { "id": "w.files", "name": "File Worker", "tools": ["fs.read", "fs.write", "fs.move", "fs.delete", "fs.search"], "maxRiskTier": 1 },
+        { "id": "w.terminal", "name": "Terminal Worker", "tools": ["terminal.exec"], "maxRiskTier": 2 },
+        { "id": "w.browser", "name": "Browser Worker", "tools": ["browser.open", "browser.search", "browser.act"], "maxRiskTier": 1 },
+        { "id": "w.screen", "name": "Screen Worker", "tools": ["screen.capture", "screen.read"], "maxRiskTier": 2 }
+      ]
+    },
+    {
+      "id": "mgr.comms",
+      "name": "Comms Manager",
+      "domain": "communication",
+      "defaultModel": "openai:gpt-4o-mini",
+      "maxRiskTier": 1,
+      "workers": [
+        { "id": "w.voice", "name": "Voice Worker", "tools": ["voice.stt", "voice.tts"], "maxRiskTier": 0 },
+        { "id": "w.notifier", "name": "Notifier", "tools": ["notify.send"], "maxRiskTier": 1 }
+      ]
+    },
+    {
+      "id": "mgr.memory",
+      "name": "Memory & Cost Manager",
+      "domain": "memory-accounting",
+      "defaultModel": "openai:gpt-4o-mini",
+      "maxRiskTier": 0,
+      "workers": [
+        { "id": "w.curator", "name": "Memory Curator", "tools": ["memory.get", "memory.set"], "maxRiskTier": 0 },
+        { "id": "w.cost", "name": "Cost Tracker", "tools": [], "maxRiskTier": 0 }
+      ]
+    }
+  ]
+}

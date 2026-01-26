@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>TOKYO-X Phone Remote</title>
+<link rel="manifest" href="/manifest.webmanifest" />
+<meta name="theme-color" content="#04070d" />
+<link rel="stylesheet" href="/phone.css" />
+</head>
+<body>
+<div class="shell">
+  <header class="topbar">
+    <h1>TOKYO-X Remote</h1>
+    <span id="conn" class="pill">disconnected</span>
+  </header>
+  <main id="main">
+    <section id="pair-view" class="view" hidden>
+      <h2>Pair Device</h2>
+      <p class="muted">Enter the pairing code shown on your desktop dashboard.</p>
+      <input id="pair-input" type="text" placeholder="K7Q2-9XNM-A3F1-8B5E" />
+      <button id="pair-btn" class="btn primary">PAIR</button>
+    </section>
+    <section id="approvals-view" class="view" hidden>
+      <header class="view-header">
+        <h2>Approvals</h2>
+        <span id="pending-count" class="badge">0</span>
+      </header>
+      <div id="approvals-list" class="approvals"></div>
+      <p id="empty-msg" class="muted" hidden>no pending approvals</p>
+    </section>
+  </main>
+  <footer class="bottombar">
+    <span class="muted mono" id="version">TOKYO-X remote</span>
+  </footer>
+</div>
+<script src="/phone.js"></script>
+</body>
+</html>

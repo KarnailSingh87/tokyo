@@ -1,0 +1,25 @@
+{
+  "name": "tokyo-x",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "TOKYO-X: personal AI orchestrator for Kapil. Orchestrator -> Managers -> Workers with a tiered permission engine.",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "smoke": "tsc && node dist/dev/smoke.js",
+    "ui": "npm run build && node dist/ui/server.js",
+    "start": "npm run ui"
+  },
+  "devDependencies": {
+    "@types/node": "^26.2.0",
+    "typescript": "^5.6.0"
+  },
+  "dependencies": {
+    "@types/ws": "^8.18.1",
+    "ws": "^8.21.3"
+  }
+}

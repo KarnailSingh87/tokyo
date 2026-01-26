@@ -1,0 +1,22 @@
+# Secrets & credentials — never publish
+config/api_keys.json
+.env
+*.key
+*.crt
+*.pem
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Node
+node_modules/
+dist/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+
+# Personal runtime data
+memory/long_term.json

@@ -1,0 +1,8 @@
+{
+  "version": "0.1.0", "defaultPreset": "nova", "voiceIdEnv": "ELEVENLABS_VOICE_ID",
+  "presets": [
+    { "id": "nova", "name": "Nova", "description": "bright", "stability": 0.5, "similarityBoost": 0.75, "style": 0.15 },
+    { "id": "atlas", "name": "Atlas", "description": "deep", "stability": 0.65, "similarityBoost": 0.8, "style": 0.1 },
+    { "id": "sage", "name": "Sage", "description": "warm", "stability": 0.55, "similarityBoost": 0.7, "style": 0.25 }
+  ]
+}

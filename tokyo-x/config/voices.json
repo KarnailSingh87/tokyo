@@ -1,0 +1,13 @@
+{
+  "version": "0.1.0",
+  "defaultPreset": "nova",
+  "voiceIdEnv": "ELEVENLABS_VOICE_ID",
+  "note": "per-preset override env: ELEVENLABS_VOICE_NOVA etc.",
+  "presets": [
+    { "id": "nova", "name": "Nova", "description": "bright, crisp assistant", "stability": 0.5, "similarityBoost": 0.75, "style": 0.15 },
+    { "id": "atlas", "name": "Atlas", "description": "deep, calm narrator", "stability": 0.65, "similarityBoost": 0.8, "style": 0.1 },
+    { "id": "sage", "name": "Sage", "description": "warm, measured advisor", "stability": 0.55, "similarityBoost": 0.7, "style": 0.25 },
+    { "id": "echo", "name": "Echo", "description": "energetic, fast briefings", "stability": 0.4, "similarityBoost": 0.75, "style": 0.35 },
+    { "id": "onyx", "name": "Onyx", "description": "low, cinematic gravitas", "stability": 0.7, "similarityBoost": 0.85, "style": 0.05 }
+  ]
+}
