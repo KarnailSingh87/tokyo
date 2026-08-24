@@ -111,4 +111,3 @@ class ValidationResult:
 
 def new_id(prefix: str) -> str:
     return f"{prefix}_{int(time.time() * 1000)}_{uuid.uuid4().hex[:8]}"
-    return f"{prefix}_{int(time.time() * 1000)}_{uuid.uuid4().hex[:8]}"

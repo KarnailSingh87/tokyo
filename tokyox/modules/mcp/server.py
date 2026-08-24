@@ -6,6 +6,21 @@ from typing import Any
 from ...core.orchestrator import Orchestrator
 
 
+def _schema_to_json(schema: Any) -> dict[str, Any]:
+    out: dict[str, Any] = {"type": schema.type}
+    if schema.description:
+        out["description"] = schema.description
+    if schema.enum:
+        out["enum"] = list(schema.enum)
+    if schema.items:
+        out["items"] = _schema_to_json(schema.items)
+    if schema.properties:
+        out["properties"] = {k: _schema_to_json(v) for k, v in schema.properties.items()}
+    if schema.required:
+        out["required"] = list(schema.required)
+    return out
+
+
 class McpServer:
     def __init__(self, orchestrator: Orchestrator):
         self._orch = orchestrator
@@ -35,7 +50,7 @@ class McpServer:
                     }
                     for t in self._orch.tools.list()
                 ]
-                return {"jsonrpc": "0.2.0", "id": id_, "result": {"tools": tools}} if False else {"jsonrpc": "2.0", "id": id_, "result": {"tools": tools}}
+                return {"jsonrpc": "2.0", "id": id_, "result": {"tools": tools}}
             elif method == "tools/call":
                 name = params.get("name")
                 args = params.get("arguments") or {}

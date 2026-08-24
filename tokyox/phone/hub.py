@@ -40,7 +40,9 @@ class ApprovalHub:
                         await ws.close()
                     continue
                 if msg.get("type") == "decision" and isinstance(msg.get("id"), str) and isinstance(msg.get("approved"), bool):
-                    await self._on_decision(msg["id"], msg["approved"])
+                    result = self._on_decision(msg["id"], msg["approved"])
+                    if hasattr(result, "__await__"):
+                        await result
         finally:
             self._clients.pop(ws, None)
 
