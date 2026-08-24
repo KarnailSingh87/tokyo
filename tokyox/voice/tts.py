@@ -29,11 +29,19 @@ def load_voices(path: str) -> VoiceConfig:
     import json
     with open(path) as f:
         raw = json.load(f)
+
+    def _normalize(preset: dict[str, Any]) -> dict[str, Any]:
+        key_map = {
+            "similarityBoost": "similarity_boost",
+            "similarityboost": "similarity_boost",
+        }
+        return {key_map.get(k, k): v for k, v in preset.items()}
+
     return VoiceConfig(
         version=raw.get("version", "0.1.0"),
         default_preset=raw.get("defaultPreset", "nova"),
         voice_id_env=raw.get("voiceIdEnv", "ELEVENLABS_VOICE_ID"),
-        presets=[VoicePreset(**p) for p in raw.get("presets", [])],
+        presets=[VoicePreset(**_normalize(p)) for p in raw.get("presets", [])],
     )
 
 
