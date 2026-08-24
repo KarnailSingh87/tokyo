@@ -49,8 +49,18 @@ def _gemini_generate(prompt: str) -> str:
     from google import genai
 
     client = genai.Client(api_key=_get_api_key())
-    resp = client.models.generate_content(model="gemini-flash-latest", contents=prompt)
-    return resp.text or ""
+    models = ["gemini-flash-latest", "gemini-2.0-flash", "gemini-2.5-flash"]
+    last_err: Exception | None = None
+    for model in models:
+        for attempt in range(3):
+            try:
+                resp = client.models.generate_content(model=model, contents=prompt)
+                if resp.text:
+                    return resp.text
+            except Exception as e:
+                last_err = e
+                time.sleep(2 ** attempt)
+    raise RuntimeError(f"AI analysis unavailable after retries: {last_err}")
 
 
 # ── Resume discovery ─────────────────────────────────────────────────────────
