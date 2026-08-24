@@ -49,6 +49,7 @@ from actions.browser_control   import browser_control
 from actions.file_controller   import file_controller
 from actions.code_helper       import code_helper
 from actions.dev_agent         import dev_agent
+from actions.linkedin_updater  import linkedin_update
 from actions.web_search        import web_search as web_search_action
 from actions.computer_control  import computer_control
 from actions.game_updater      import game_updater
@@ -546,6 +547,35 @@ TOOL_DECLARATIONS = [
             "required": ["category", "key", "value"]
         }
     },
+    {
+        "name": "linkedin_update",
+        "description": (
+            "Updates the user's LinkedIn profile automatically from their resume/CV. "
+            "Use whenever the user wants to update/improve/polish their LinkedIn profile or 'About'/'Headline' section. "
+            "Finds their most recent resume automatically (or uses the given path), rewrites it into professional "
+            "LinkedIn content with AI, then applies it on linkedin.com via a real browser session. "
+            "The first run opens a browser window where the user logs in once; afterwards it is fully automatic."
+        ),
+        "parameters": {
+            "type": "OBJECT",
+            "properties": {
+                "resume_path": {
+                    "type": "STRING",
+                    "description": "Optional full path to the resume file (.pdf/.docx/.txt). Leave empty to auto-find the newest resume/cv file."
+                },
+                "sections": {
+                    "type": "ARRAY",
+                    "items": {"type": "STRING"},
+                    "description": "Which parts to update: headline, about, skills, experience, education. Default: all."
+                },
+                "preview_only": {
+                    "type": "BOOLEAN",
+                    "description": "If true, only generate the content and show a preview without touching LinkedIn."
+                }
+            },
+            "required": []
+        }
+    },
 ]
 
 class TokyoLive:
@@ -952,6 +982,13 @@ class TokyoLive:
                     result = "ok"
                 else:
                     result = "Missing key or value — nothing saved."
+
+            elif name == "linkedin_update":
+                r = await loop.run_in_executor(
+                    None,
+                    lambda: linkedin_update(parameters=args, player=self.ui, speak=self.speak)
+                )
+                result = r or "Done."
 
             elif name == "shutdown_tokyo":
                 self.ui.write_log("SYS: Shutdown requested.")
