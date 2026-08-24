@@ -50,7 +50,7 @@ def heuristic_plan(goal: str) -> list[GoalStepPlan]:
 
 async def llm_plan(router: ModelRouter, tools_desc: str, goal: str) -> list[GoalStepPlan] | None:
     try:
-        from .router.model_router import ChatMessage, ChatRequest
+        from ..router.model_router import ChatMessage, ChatRequest
         resp = await router.chat(
             ["openai:gpt-4o-mini", "openrouter:anthropic/claude-3.5-sonnet"],
             ChatRequest(
@@ -76,7 +76,7 @@ async def llm_plan(router: ModelRouter, tools_desc: str, goal: str) -> list[Goal
 async def verify_run(router: ModelRouter, goal: str, steps: list) -> dict[str, str]:
     digest = "\n".join(f"{i+1}. {s.plan.tool} → {str(s.outcome.status)[:160]}" for i, s in enumerate(steps))
     try:
-        from .router.model_router import ChatMessage, ChatRequest
+        from ..router.model_router import ChatMessage, ChatRequest
         resp = await router.chat(
             ["openai:gpt-4o-mini", "openrouter:anthropic/claude-3.5-sonnet"],
             ChatRequest(

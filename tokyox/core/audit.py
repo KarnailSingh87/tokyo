@@ -1,4 +1,5 @@
 from __future__ import annotations
+import dataclasses
 import json
 import os
 import time
@@ -9,6 +10,16 @@ from .types import AuditEvent, AuditSink
 
 def _today_stamp() -> str:
     return time.strftime("%Y-%m-%d")
+
+
+def _json_default(obj: Any) -> Any:
+    if dataclasses.is_dataclass(obj):
+        return dataclasses.asdict(obj)
+    if hasattr(obj, "value"):
+        return obj.value
+    if hasattr(obj, "__dict__"):
+        return obj.__dict__
+    return str(obj)
 
 
 class FileAuditSink(AuditSink):
@@ -23,8 +34,8 @@ class FileAuditSink(AuditSink):
 
     def record(self, event: AuditEvent) -> None:
         try:
-            with open(self._file, "a") as f:
-                f.write(json.dumps(event.__dict__) + "\n")
+            with open(self._file, "a", encoding="utf-8") as f:
+                f.write(json.dumps(_json_default(event), default=_json_default) + "\n")
         except Exception:
             if self._console_echo:
                 print("[audit] write failed")

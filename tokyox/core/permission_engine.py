@@ -75,12 +75,14 @@ class PermissionEngine:
             if rule.categories and req.category not in rule.categories:
                 continue
             if rule.arg_regex:
+                matched_all = True
                 for arg_name, pattern in rule.arg_regex.items():
                     raw = req.args.get(arg_name) if req.args else None
                     if not isinstance(raw, str) or not re.search(pattern, raw):
+                        matched_all = False
                         break
-                else:
-                    return rule
+                if not matched_all:
+                    continue
             return rule
         return None
 

@@ -118,7 +118,6 @@ def create_tool_executors(
     twin: Any | None = None,
     extra: dict[str, Callable] | None = None,
 ) -> dict[str, Callable]:
-    sandbox = make_sandbox(workspace_root)
     file = make_sandbox(workspace_root)
     terminal = make_terminal_tool(workspace_root)
     browser = make_browser_tools()
@@ -136,21 +135,46 @@ def create_tool_executors(
         "browser.act": browser["browser.act"],
         "screen.capture": screen["screen.capture"],
         "screen.read": screen["screen.read"],
-        "memory.get": lambda args, ctx: (
-            twin.get(args["key"])
-            if twin and twin.get(args["key"])
-            else _memory_store.get(args["key"])
-        ),
-        "memory.set": lambda args, ctx: (
-            twin.set(args["key"], args["value"], args.get("tags") or [])
-            if twin
-            else _memory_store.update({args["key"]: {"value": args["value"], "tags": args.get("tags") or [], "ts": __import__("time").strftime("%Y-%m-%dT%H:%M:%SZ", __import__("time").gmtime())}})
-            or _memory_store[args["key"]]
-        ),
-        "voice.stt": lambda a, c: {"configured": False, "note": "use /api/voice/stt endpoint"},
-        "voice.tts": lambda a, c: {"configured": False, "note": "use /api/voice/tts endpoint"},
-        "notify.send": lambda a, c: {"queued": True, "target": a.get("target", "log"), "message": a.get("message", ""), "ts": __import__("time").strftime("%Y-%m-%dT%H:%M:%SZ", __import__("time").gmtime())},
     }
+
+    async def _memory_get(args, ctx):
+        if twin is not None:
+            val = twin.get(args["key"])
+            if val is not None:
+                return val
+        return _memory_store.get(args["key"])
+
+    async def _memory_set(args, ctx):
+        if twin is not None:
+            return twin.set(args["key"], args["value"], args.get("tags") or [])
+        _memory_store[args["key"]] = {
+            "value": args["value"],
+            "tags": args.get("tags") or [],
+            "ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        }
+        return _memory_store[args["key"]]
+
+    async def _voice_stt(args, ctx):
+        return {"configured": False, "note": "use /api/voice/stt endpoint"}
+
+    async def _voice_tts(args, ctx):
+        return {"configured": False, "note": "use /api/voice/tts endpoint"}
+
+    async def _notify_send(args, ctx):
+        return {
+            "queued": True,
+            "target": args.get("target", "log"),
+            "message": args.get("message", ""),
+            "ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        }
+
+    execs.update({
+        "memory.get": _memory_get,
+        "memory.set": _memory_set,
+        "voice.stt": _voice_stt,
+        "voice.tts": _voice_tts,
+        "notify.send": _notify_send,
+    })
     if extra:
         execs.update(extra)
     return execs

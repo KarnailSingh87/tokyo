@@ -134,9 +134,8 @@ class TokyoX:
     async def run_goal(self, goal: str, actor: str = "kapil") -> GoalRun:
         return await self._agent_loop.run_goal(goal, actor)
 
-    def _goal_runner(self, payload: dict, job, report):
-        import asyncio
-        return asyncio.run(self.run_goal(payload.get("goal", ""), payload.get("actor", "kapil")))
+    async def _goal_runner(self, payload: dict, job, report):
+        return await self.run_goal(payload.get("goal", ""), payload.get("actor", "kapil"))
 
     async def synthesize(self, text: str, preset: str | None = None):
         return await self._tts.synthesize(text, preset)

@@ -755,6 +755,19 @@ class TokyoLive:
             cfg["proactivity"] = types.ProactivityConfig(proactive_audio=True)
         return types.LiveConnectConfig(**cfg)
 
+    def _tool_done(self, fc, name, result) -> types.FunctionResponse:
+        if not self.ui.muted:
+            self.ui.set_state("LISTENING")
+        print(f"[TOKYO] 📤 {name} → {str(result)[:80]}")
+        return types.FunctionResponse(id=fc.id, name=name, response={"result": result})
+
+    def _tool_stopped(self, fc, name, message) -> types.FunctionResponse:
+        self.ui.write_log(f"SYS: {message}")
+        if not self.ui.muted:
+            self.ui.set_state("LISTENING")
+        print(f"[TOKYO] 📤 {name} → {str(message)[:80]}")
+        return types.FunctionResponse(id=fc.id, name=name, response={"result": message})
+
     async def _execute_tool(self, fc) -> types.FunctionResponse:
         name = fc.name
         args = dict(fc.args or {})
@@ -767,52 +780,37 @@ class TokyoLive:
             outcome = await self._tokyox.execute_tool("kapil", name, args)
             if outcome.status == "approval-required":
                 # Approval needed - inform user and wait (with timeout)
-                self.ui.write_log(f"SYS: Approval required for {name} (tier {outcome.decision.request.risk_tier if outcome.decision and outcome.decision.request else '?'})")
+                rule_id = getattr(outcome.decision, "rule_id", "?") if outcome.decision else "?"
+                self.ui.write_log(f"SYS: Approval required for {name} (rule {rule_id})")
                 if outcome.approval:
                     self.ui.write_log(f"SYS: Approval token: {outcome.approval.token[:16]}... (expires {outcome.approval.expires_at})")
                     # Wait for approval (up to 2 minutes)
                     resolved = await self._tokyox.approvals.wait_resolved(outcome.approval.id, 120_000)
                     if resolved is None:
-                        result = "Approval timed out."
-                    elif resolved.get("approved"):
+                        return self._tool_stopped(fc, name, "Approval timed out — nothing was executed.")
+                    if resolved.get("approved"):
                         # Re-execute with approval granted
                         outcome = await self._tokyox.execute_tool("kapil", name, args)
+                        if outcome.status == "executed":
+                            return self._tool_done(fc, name, outcome.result)
+                        if outcome.status != "unknown-tool":
+                            msg = f"Execution failed after approval: {outcome.error or outcome.status}"
+                            return self._tool_stopped(fc, name, msg)
                     else:
-                        result = "Approval denied by Kapil."
+                        return self._tool_stopped(fc, name, "Approval denied by user.")
                 else:
-                    result = "Approval required but no approval handle."
+                    return self._tool_stopped(fc, name, "Approval required but no approval handle.")
             elif outcome.status == "denied":
-                result = f"Action denied: {outcome.decision.reason if outcome.decision else 'policy'}"
+                reason = outcome.decision.reason if outcome.decision else "policy"
+                self.ui.write_log(f"SYS: {name} blocked by policy ({reason})")
+                return self._tool_stopped(fc, name, f"Action denied by policy: {reason}")
             elif outcome.status == "invalid":
-                result = f"Invalid arguments: {outcome.error}"
-            elif outcome.status == "unknown-tool":
-                result = f"Unknown tool: {name}"
+                return self._tool_stopped(fc, name, f"Invalid arguments: {outcome.error}")
             elif outcome.status == "error":
-                result = f"Execution error: {outcome.error}"
-            else:
-                # executed successfully
-                if not self.ui.muted:
-                    self.ui.set_state("LISTENING")
-                print(f"[TOKYO] 📤 {name} → {str(outcome.result)[:80]}")
-                return types.FunctionResponse(
-                    id=fc.id, name=name,
-                    response={"result": outcome.result}
-                )
-        else:
-            # Fallback to original logic if TOKYO-X not initialized
-            pass
-            category = args.get("category", "notes")
-            key      = args.get("key", "")
-            value    = args.get("value", "")
-            if key and value:
-                update_memory({category: {key: {"value": value}}})
-                print(f"[Memory] 💾 save_memory: {category}/{key} = {value}")
-            if not self.ui.muted:
-                self.ui.set_state("LISTENING")
-            return types.FunctionResponse(
-                id=fc.id, name=name,
-                response={"result": "ok", "silent": True}
-            )
+                return self._tool_stopped(fc, name, f"Execution error: {outcome.error}")
+            elif outcome.status == "executed":
+                return self._tool_done(fc, name, outcome.result)
+            # "unknown-tool" → not governed by TOKYO-X; legacy dispatcher below handles it
 
         loop   = asyncio.get_event_loop()
         result = "Done."
@@ -943,6 +941,17 @@ class TokyoLive:
                     result = ("Monitoring: " + ", ".join(topics)) if topics else "No topics are being monitored."
                 else:
                     result = "Specify action (add/remove/list) and a topic."
+
+            elif name == "save_memory":
+                category = args.get("category", "notes")
+                key      = args.get("key", "")
+                value    = args.get("value", "")
+                if key and value:
+                    update_memory({category: {key: {"value": value}}})
+                    print(f"[Memory] 💾 save_memory: {category}/{key} = {value}")
+                    result = "ok"
+                else:
+                    result = "Missing key or value — nothing saved."
 
             elif name == "shutdown_tokyo":
                 self.ui.write_log("SYS: Shutdown requested.")

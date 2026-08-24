@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Any, Callable, Awaitable
+from typing import Any, Callable, Awaitable, Literal
 
 from .types import Decision, ToolDefinition, RiskTier, ToolCategory
 from .tool_schema import ToolRegistry

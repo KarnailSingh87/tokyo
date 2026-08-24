@@ -5,7 +5,7 @@ import os
 import time
 import uuid
 from dataclasses import dataclass, field
-from typing import Any, Callable, Awaitable
+from typing import Any, Callable, Awaitable, Literal
 
 from ..memory.twin import TwinMemory
 
