@@ -75,7 +75,7 @@ LIVE_MODEL          = "models/gemini-2.5-flash-native-audio-preview-12-2025"
 CHANNELS            = 1
 SEND_SAMPLE_RATE    = 16000
 RECEIVE_SAMPLE_RATE = 24000
-CHUNK_SIZE          = 1024
+CHUNK_SIZE          = 512
 
 def _get_api_key() -> str:
     with open(API_CONFIG_PATH, "r", encoding="utf-8") as f:
@@ -752,7 +752,13 @@ class TokyoLive:
             f"{_addr}\n\n"
         )
 
-        parts = [time_ctx, identity_ctx]
+        speed_ctx = (
+            "[SPEED & BREVITY PROTOCOL]\n"
+            "Respond with absolute minimum latency. Deliver direct, punchy answers in 1-2 short sentences. "
+            "Never use preamble, filler, or long explanations unless specifically asked.\n\n"
+        )
+
+        parts = [time_ctx, identity_ctx, speed_ctx]
         if mem_str:
             parts.append(mem_str)
         parts.append(sys_prompt)
@@ -1080,10 +1086,10 @@ class TokyoLive:
                         else:
                             if self._turn_done_event and self._turn_done_event.is_set():
                                 self._turn_done_event.clear()
-                            # Split into ~50 ms chunks so interrupt() stops audio within 50 ms
-                            # (24000 Hz × 2 bytes/sample × 0.05 s = 2400 bytes per slice)
+                            # Split into ~25 ms chunks so interrupt() and playback start in <25 ms
+                            # (24000 Hz × 2 bytes/sample × 0.025 s = 1200 bytes per slice)
                             _audio_data = response.data
-                            _SLICE = 2400
+                            _SLICE = 1200
                             for _i in range(0, len(_audio_data), _SLICE):
                                 self.audio_in_queue.put_nowait(_audio_data[_i : _i + _SLICE])
 
@@ -1216,7 +1222,7 @@ class TokyoLive:
                 # thread-pool round-trips (was one asyncio.to_thread per 50ms slice).
                 # Cap at ~200 ms so interrupt() still stops audio within ~200 ms.
                 batch = bytearray(chunk)
-                while len(batch) < 9600:   # 9600 bytes ≈ 200 ms at 24 kHz / 16-bit mono
+                while len(batch) < 2400:   # 2400 bytes ≈ 50 ms at 24 kHz / 16-bit mono
                     try:
                         batch.extend(self.audio_in_queue.get_nowait())
                     except asyncio.QueueEmpty:

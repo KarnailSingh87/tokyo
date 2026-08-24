@@ -617,55 +617,40 @@ class HudCanvas(QWidget):
             p.setPen(QPen(w_col, 2.0, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap, Qt.PenJoinStyle.RoundJoin))
             p.drawPath(w_path)
 
-        # 7. Subtitle / Prompt Transcript (if active)
-        if self.subtitle and self._subtitle_alpha > 0.05:
-            sub_w = min(W * 0.80, 520.0)
-            sub_h = 36.0
-            sub_y = wy + 20.0
-            sub_rect = QRectF(cx - sub_w / 2.0, sub_y, sub_w, sub_h)
-
-            p.setBrush(QBrush(QColor(8, 8, 8, int(230 * self._subtitle_alpha))))
-            p.setPen(QPen(QColor(40, 40, 40, int(100 * self._subtitle_alpha)), 1.0))
-            p.drawRoundedRect(sub_rect, 10.0, 10.0)
-
-            p.setFont(app_font(8))
-            p.setPen(QPen(QColor(245, 245, 245, int(240 * self._subtitle_alpha))))
-            p.drawText(sub_rect.adjusted(12, 0, -12, 0), Qt.AlignmentFlag.AlignCenter, self.subtitle)
+        # 7. Clean Minimal Status Pill
+        sy = wy + 24.0
+        if self.muted:
+            st_text = "Muted"
+            dot_col = QColor(255, 71, 87)
+        elif self.speaking:
+            st_text = "Speaking"
+            dot_col = QColor(0, 240, 255)
+        elif self.state in ("THINKING", "PROCESSING"):
+            st_text = "Thinking"
+            dot_col = QColor(157, 78, 221)
+        elif self.state == "LISTENING":
+            st_text = "Listening"
+            dot_col = QColor(0, 245, 160)
         else:
-            # 8. Clean Minimal Status Pill
-            sy = wy + 24.0
-            if self.muted:
-                st_text = "Muted"
-                dot_col = QColor(255, 71, 87)
-            elif self.speaking:
-                st_text = "Speaking"
-                dot_col = QColor(0, 240, 255)
-            elif self.state in ("THINKING", "PROCESSING"):
-                st_text = "Thinking"
-                dot_col = QColor(157, 78, 221)
-            elif self.state == "LISTENING":
-                st_text = "Listening"
-                dot_col = QColor(0, 245, 160)
-            else:
-                st_text = "Ready"
-                dot_col = QColor(0, 240, 255)
+            st_text = "Ready"
+            dot_col = QColor(0, 240, 255)
 
-            pill_w, pill_h = 100.0, 24.0
-            pill_rect = QRectF(cx - pill_w / 2.0, sy, pill_w, pill_h)
+        pill_w, pill_h = 100.0, 24.0
+        pill_rect = QRectF(cx - pill_w / 2.0, sy, pill_w, pill_h)
 
-            p.setBrush(QBrush(QColor(255, 255, 255, 10)))
-            p.setPen(QPen(QColor(255, 255, 255, 20), 1.0))
-            p.drawRoundedRect(pill_rect, 12.0, 12.0)
+        p.setBrush(QBrush(QColor(255, 255, 255, 10)))
+        p.setPen(QPen(QColor(255, 255, 255, 20), 1.0))
+        p.drawRoundedRect(pill_rect, 12.0, 12.0)
 
-            dot_alpha = int(180 + 75 * math.sin(self._t * 4.0))
-            dot_c = QColor(dot_col); dot_c.setAlpha(dot_alpha)
-            p.setBrush(QBrush(dot_c))
-            p.setPen(Qt.PenStyle.NoPen)
-            p.drawEllipse(QPointF(cx - 30.0, sy + 12.0), 3.0, 3.0)
+        dot_alpha = int(180 + 75 * math.sin(self._t * 4.0))
+        dot_c = QColor(dot_col); dot_c.setAlpha(dot_alpha)
+        p.setBrush(QBrush(dot_c))
+        p.setPen(Qt.PenStyle.NoPen)
+        p.drawEllipse(QPointF(cx - 30.0, sy + 12.0), 3.0, 3.0)
 
-            p.setFont(app_font(7, bold=True))
-            p.setPen(QPen(QColor(230, 240, 250, 220)))
-            p.drawText(QRectF(cx - 18.0, sy, 60.0, pill_h), Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter, st_text)
+        p.setFont(app_font(7, bold=True))
+        p.setPen(QPen(QColor(230, 240, 250, 220)))
+        p.drawText(QRectF(cx - 18.0, sy, 60.0, pill_h), Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter, st_text)
 
 
 class MetricBar(QWidget):
@@ -1918,13 +1903,6 @@ class MainWindow(QMainWindow):
 
     def _handle_log_event(self, text: str):
         self._log.append_log(text)
-        # Show clean subtitle if spoken by assistant or user
-        if text.startswith(f"{self._assistant_name}:"):
-            speech = text.split(":", 1)[1].strip()
-            self.hud.set_subtitle(speech)
-        elif text.startswith("You:"):
-            speech = text.split(":", 1)[1].strip()
-            self.hud.set_subtitle(f'"{speech}"')
 
     def _show_camera_frame(self, img_bytes: bytes):
         self._cam_preview.show_frame(img_bytes)
