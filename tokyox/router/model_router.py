@@ -4,7 +4,7 @@ import os
 import time
 import uuid
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, Literal
 
 import httpx
 
@@ -268,7 +268,7 @@ class ModelRouter:
         return {
             "providers": self.provider_names(),
             "mock_fallback": self.mock_fallback,
-            "stats": self.stats.__dict__,
+            "stats": self.logger.stats.__dict__,
         }
 
     async def chat(self, specs: str | list[str], req: ChatRequest) -> ChatResponse:

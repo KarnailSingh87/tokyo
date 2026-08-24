@@ -7,14 +7,7 @@ import httpx
 
 
 def decode_entities(s: str) -> str:
-    return (
-        s.replace("&", "&")
-        .replace("<", "<")
-        .replace(">", ">")
-        .replace('"', '"')
-        .replace("'", "'")
-        .replace("'", "'")
-    )
+    return html.unescape(s)
 
 
 def strip_tags(s: str) -> str:
@@ -51,7 +44,7 @@ def make_browser_tools():
         if not q:
             raise ValueError("query required")
         async with httpx.AsyncClient(timeout=15.0, headers={"User-Agent": "TokyoX/0.1"}) as client:
-            resp = await client.get(f"https://html.duckduckgo.com/html/?q={httpx.URL.encode(q)}")
+            resp = await client.get("https://html.duckduckgo.com/html/", params={"q": q})
             html_text = resp.text
             results: list[dict[str, str]] = []
             for m in re.finditer(r'<a[^>]*class="result__a"[^>]*href="([^"]+)"[^>]*>([\s\S]*?)</a>', html_text):

@@ -31,11 +31,11 @@ class McpServer:
                     {
                         "name": t.name,
                         "description": t.description,
-                        "inputSchema": t.input_schema.__dict__ if t.input_schema else {},
+                        "inputSchema": _schema_to_json(t.input_schema) if t.input_schema else {},
                     }
                     for t in self._orch.tools.list()
                 ]
-                return {"jsonrpc": "2.0", "id": id_, "result": {"tools": tools}}
+                return {"jsonrpc": "0.2.0", "id": id_, "result": {"tools": tools}} if False else {"jsonrpc": "2.0", "id": id_, "result": {"tools": tools}}
             elif method == "tools/call":
                 name = params.get("name")
                 args = params.get("arguments") or {}
