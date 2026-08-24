@@ -3,7 +3,7 @@
   "defaultVerdict": "CONFIRM",
   "rules": [
     { "id": "deny-destructive", "priority": 100, "verdict": "DENY", "reason": "destructive commands",
-      "categories": ["terminal"], "argRegex": { "arg": "command", "pattern": "(rm\s+-rf\s+/|mkfs|dd\s+if=.*of=/dev/|shutdown|reboot)" } },
+      "categories": ["terminal"], "argRegex": { "arg": "command", "pattern": "(rm\\s+-rf\\s+/|mkfs|dd\\s+if=.*of=/dev/|shutdown|reboot)" } },
     { "id": "allow-read", "priority": 60, "verdict": "ALLOW", "reason": "read-only", "tools": ["fs.read", "fs.search"] },
     { "id": "confirm-write", "priority": 50, "verdict": "CONFIRM", "reason": "file write", "tools": ["fs.write", "fs.delete"] },
     { "id": "confirm-terminal", "priority": 40, "verdict": "CONFIRM", "reason": "shell exec", "categories": ["terminal"] },
