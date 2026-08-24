@@ -24,7 +24,21 @@ class SkillRegistry:
     def load(self, path: str) -> None:
         with open(path) as f:
             raw = json.load(f)
+
+        key_map = {
+            "promptTemplate": "prompt_template",
+            "prompttemplate": "prompt_template",
+            "allowedTools": "allowed_tools",
+            "allowedtools": "allowed_tools",
+            "modelSpec": "model_spec",
+            "modelspec": "model_spec",
+        }
+
+        def _normalize(skill: dict[str, Any]) -> dict[str, Any]:
+            return {key_map.get(k, k): v for k, v in skill.items()}
+
         for s in raw.get("skills", []):
+            s = _normalize(s)
             self._skills[s["id"]] = Skill(**s)
 
     def list(self) -> list[Skill]:
