@@ -43,6 +43,7 @@ It's not just an assistant — it's an extension of your digital life.
 | 💻 Code Helper | Inline code review, debugging, and generation |
 | 🌐 Browser Control | Open URLs, navigate tabs, and interact with the browser by voice |
 | 📨 Send Message | Compose and send messages through WhatsApp, Telegram, and more |
+| 💼 LinkedIn Updater | Upload your resume — AI rewrites it and updates your LinkedIn profile automatically |
 | 🎬 YouTube Control | Search, play, and control YouTube playback by voice |
 | 🖱️ Desktop Control | Taskbar, window management, and desktop-level operations |
 | 🧑‍💻 Silent Language Memory | Detects spoken language on first use — all future sessions adapt automatically |
@@ -54,6 +55,23 @@ It's not just an assistant — it's an extension of your digital life.
 ---
 
 ## 🆕 What's New
+
+### 💼 LinkedIn Auto-Updater — Upload Your Resume, Get an Updated Profile
+Tell TOKYO *"update my LinkedIn profile with my resume"* and it handles everything:
+1. Finds your newest resume/CV automatically (Downloads, Desktop, Documents, TOKYO Uploads) or accepts a path
+2. Extracts text from PDF/DOCX/TXT
+3. Gemini rewrites it into polished LinkedIn content — headline, about, experience, education, skills
+4. Applies it to your real profile via a persistent browser session — log in once by hand, then it's fully automatic
+5. `preview_only` mode shows the generated content on screen before touching anything
+Parsed profiles are cached in `memory/linkedin_latest.json`, so re-runs skip re-parsing.
+
+### 🐛 Build LIII — Stability Pass
+- Fixed approval flow crashing the Live session; denied/timed-out tools no longer execute; approved tools no longer run twice
+- Fixed permission engine denying every terminal command via broken arg-regex matching
+- `save_memory` now actually persists (was silently returning "Unknown tool")
+- TOKYO-X: memory/voice/notify tools execute correctly, web search works, agent planner import fixed, audit trail actually writes, goal runner fixed
+- Activated dormant plugins: calorie counter, pushup counter, video upload
+- Added `pypdf` / `python-docx` / `pdfplumber` for document parsing
 
 ### 🧩 Plugin System — Extend TOKYO Without Touching a Single Core File
 The headline feature of TOKYO, and the reason for its final architecture version. Every new capability from now on ships as a single `.py` file:

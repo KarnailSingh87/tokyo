@@ -50,7 +50,7 @@ def _gemini_generate(prompt: str) -> str:
     from google import genai
 
     client = genai.Client(api_key=_get_api_key())
-    models = ["gemini-flash-latest", "gemini-2.0-flash", "gemini-2.5-flash"]
+    models = ["gemini-flash-latest", "gemini-3.5-flash", "gemini-2.5-flash"]
     last_err: Exception | None = None
     with ThreadPoolExecutor(max_workers=1) as pool:
         for model in models:
