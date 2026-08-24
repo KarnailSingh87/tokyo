@@ -1234,17 +1234,14 @@ class TokyoLive:
             stream.stop()
             stream.close()
 
-    # ── Morning briefing ────────────────────────────────────────────────────────
+    # ── Startup greeting ────────────────────────────────────────────────────────
 
     async def _send_startup_briefing(self) -> None:
-        """
-        Two-phase briefing optimized for speed:
-          Phase 1 — instant greeting (no tools) → speech starts in <1s
-          Phase 2 — news pre-fetched in a background thread while Phase 1 plays,
-                    delivered as ready text (no Gemini tool-call round-trip) and
-                    shown on the UI content panel. Waits for turn_complete event
-                    instead of a fixed sleep so there is no unnecessary gap.
-        """
+        """Simple, instant natural greeting on startup (like ChatGPT / Siri)."""
+        await asyncio.sleep(0.3)
+        if not self.session:
+            return
+
         memory   = load_memory()
         identity = memory.get("identity", {})
 
@@ -1254,39 +1251,14 @@ class TokyoLive:
 
         lang = _val("language")
         name = _val("name")
-        time_str = datetime.now().strftime("%H:%M")
-
-        # Start fetching news immediately — runs in parallel while phase 1 plays
-        loop = asyncio.get_event_loop()
-        news_future = loop.run_in_executor(None, _fetch_news_sync, "top world news today")
-
-        await asyncio.sleep(0.3)
-        if not self.session:
-            return
-
-        # ── Phase 1: instant greeting ─────────────────────────────────────────
         lang_clause = f" Respond in {lang}." if lang else ""
-        name_clause = f" Address the user as {name}." if name else ""
-
-        # Inject last session context if available — pop removes it so it's never repeated
-        last = await asyncio.to_thread(pop_last_session)
-        session_clause = ""
-        if last:
-            try:
-                _delta = (datetime.now() - datetime.strptime(last["date"], "%Y-%m-%d")).days
-                _when  = "earlier today" if _delta == 0 else ("yesterday" if _delta == 1 else f"{_delta} days ago")
-            except Exception:
-                _when = "last time"
-            session_clause = (
-                f" Also briefly and naturally mention that {_when}: {last['summary']}"
-            )
+        name_clause = f" User name is {name}." if name else ""
 
         p1 = (
-            f"Greet the user warmly, mention it is {time_str}, and say you are fetching today's news now.{session_clause} "
-            f"Keep it to 2 short sentences max. Do not call any tools.{lang_clause}{name_clause}"
+            f"Just say a very short, friendly, and natural 'Hey!' or 'Hey, how can I help you today?'. "
+            f"Keep it to 1 short sentence max. Do not mention fetching news, time, or system status. Do not call any tools.{lang_clause}{name_clause}"
         )
 
-        # Clear the turn-done event so we can wait for Phase 1 to finish
         if self._turn_done_event:
             self._turn_done_event.clear()
 
@@ -1294,66 +1266,7 @@ class TokyoLive:
             turns={"parts": [{"text": p1}]},
             turn_complete=True,
         )
-        self.ui.write_log("SYS: Briefing phase 1 (greeting) sent.")
-
-        # ── Phase 2: fire as soon as Phase 1 audio is done ───────────────────
-        async def _deliver_news():
-            try:
-                lang_str = f" Respond in {lang}." if lang else ""
-
-                # Wait for news fetch (already running) and Phase 1 turn-complete
-                # in parallel — whichever takes longer determines the wait time
-                news_done   = asyncio.wrap_future(news_future)
-                turn_waited = False
-                if self._turn_done_event:
-                    try:
-                        await asyncio.wait_for(self._turn_done_event.wait(), timeout=6.0)
-                        turn_waited = True
-                    except asyncio.TimeoutError:
-                        pass
-
-                # Extra buffer: turn_complete fires when Gemini finishes *generating*
-                # Phase 1, but audio may still be playing.  Waiting a beat here
-                # prevents Phase 2 audio from arriving while Phase 1 is mid-sentence
-                # (which sounds like a "repeated first response" to the user).
-                if turn_waited:
-                    await asyncio.sleep(0.8)
-                else:
-                    await asyncio.sleep(1.0)
-
-                try:
-                    news_text = await asyncio.wait_for(news_done, timeout=4.0)
-                except Exception:
-                    news_text = ""
-
-                if not self.session:
-                    return
-
-                if news_text and len(news_text) > 60:
-                    # Show on UI content panel immediately
-                    self.ui.show_content("NEWS — top world news today", news_text)
-
-                    p2 = (
-                        f"[BRIEFING] Here are today's top news headlines:\n{news_text}\n\n"
-                        "Pick ONE headline, summarise it in one sentence, then say the full list "
-                        f"is displayed on screen. Do not call any tools.{lang_str}"
-                    )
-                else:
-                    p2 = (
-                        "News headlines could not be fetched right now. "
-                        f"Let the user know briefly.{lang_str}"
-                    )
-
-                await self.session.send_client_content(
-                    turns={"parts": [{"text": p2}]},
-                    turn_complete=True,
-                )
-                self.ui.write_log("SYS: Briefing phase 2 (news) sent.")
-            except Exception as e:
-                print(f"[Briefing] Phase 2 error: {e}")
-                self.ui.write_log(f"SYS: Briefing phase 2 failed: {e}")
-
-        asyncio.create_task(_deliver_news())
+        self.ui.write_log("SYS: Startup greeting sent.")
 
     # ── Session memory ──────────────────────────────────────────────────────────
 

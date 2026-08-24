@@ -1,0 +1,65 @@
+{
+  "name": "Karnail Singh",
+  "headline": "MERN Stack Developer Intern @ Sensation Software Solutions | React.js • Node.js • Express.js • MongoDB | Building scalable, high-performance web applications and secure cloud-native solutions.",
+  "about": "I am a passionate Full Stack Developer specializing in the MERN stack (MongoDB, Express.js, React.js, Node.js) and cloud-native application development. With hands-on experience designing scalable web applications and secure RESTful APIs, I enjoy bridging the gap between elegant frontend interfaces and robust backend systems.\n\nDuring my internships at Sensation Software Solutions and Edunet Foundation (in partnership with Microsoft & IBM SkillsBuild), I successfully deployed cloud-native serverless applications, built AI chatbots, and integrated secure authentication systems like JWT and RBAC. I focus on optimizing performance, whether improving page loads by 35% or boosting inventory efficiency by 60% in my full-stack projects.\n\nCurrently pursuing my B.Tech in Computer Science, I am constantly exploring new technologies like blockchain development and cloud architecture. I thrive in collaborative, Agile environments where I can apply strong data structures, algorithms, and system design principles to ship production-ready features.",
+  "experience": [
+    {
+      "title": "MERN Stack Developer Intern",
+      "company": "Sensation Software Solutions Pvt. Ltd.",
+      "dates": "Jun 2026 – Aug 2026",
+      "description": "Developed full-stack web applications using the MERN stack while collaborating in an Agile environment on live client projects. Built and deployed 5+ cloud-native serverless applications on IBM Cloud, achieving 99.2% uptime and reducing application provisioning time by 40%. Designed and integrated 12+ secure REST APIs using JWT Authentication and Role-Based Access Control."
+    },
+    {
+      "title": "AI & Cloud Intern",
+      "company": "Edunet Foundation, Microsoft & IBM SkillsBuild",
+      "dates": "Apr 2025 – Aug 2025",
+      "description": "Completed two AICTE-certified virtual internships covering Artificial Intelligence, cloud computing, and IBM Watsonx. Developed and presented mentor-guided AI projects, including a Watsonx Orchestrate phishing detection agent and a Watsonx Assistant chatbot."
+    }
+  ],
+  "education": [
+    {
+      "school": "Himachal Pradesh Technical University",
+      "degree": "Bachelor of Technology (B.Tech) in Computer Science",
+      "dates": "Aug 2023 – May 2027"
+    },
+    {
+      "school": "D.A.V Public School, Hamirpur (H.P.)",
+      "degree": "Class XII",
+      "dates": "Mar 2022 – Mar 2023"
+    },
+    {
+      "school": "D.A.V Public School, Hamirpur (H.P.)",
+      "degree": "Class X",
+      "dates": "Mar 2020 – Mar 2021"
+    }
+  ],
+  "skills": [
+    "React.js",
+    "Node.js",
+    "Express.js",
+    "MongoDB",
+    "JavaScript",
+    "TypeScript",
+    "REST APIs",
+    "AWS",
+    "IBM Cloud",
+    "Docker",
+    "Solidity",
+    "Tailwind CSS",
+    "Git",
+    "JWT Authentication",
+    "Data Structures"
+  ],
+  "_meta": {
+    "source_file": "/Users/harsh/Desktop/Karnail_Singh _Resume.pdf",
+    "generated_at": "2026-08-24T23:30:36",
+    "sections": [
+      "headline",
+      "about",
+      "skills",
+      "experience",
+      "education"
+    ],
+    "cached_at": "2026-08-24T23:30:36"
+  }
+}
