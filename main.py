@@ -1,3 +1,5 @@
+import warnings
+warnings.filterwarnings("ignore")
 import platform as _platform
 import subprocess as _subprocess
 
@@ -605,6 +607,8 @@ class TokyoLive:
         self._sys_monitor      = SystemMonitor()  # persistent cooldown state
         self._proactive        = ProactiveEngine()
         self._last_user_speech = time.monotonic()  # updated on every user utterance
+        self._last_spoke_time  = 0.0               # monotonic timestamp when Tokyo finished speaking
+        self._last_assistant_response = ""        # prevent repeating same answer
         self._session_log: list[str] = []          # conversation turns for end-of-session summary
 
         self._enhanced_live = True  # affective dialog + proactive audio; auto-disabled if the server rejects them
@@ -676,6 +680,8 @@ class TokyoLive:
     def set_speaking(self, value: bool):
         with self._speaking_lock:
             self._is_speaking = value
+            if not value:
+                self._last_spoke_time = time.monotonic()
         if value:
             self.ui.set_state("SPEAKING")
         elif not self.ui.muted:
@@ -753,9 +759,10 @@ class TokyoLive:
         )
 
         speed_ctx = (
-            "[SPEED & BREVITY PROTOCOL]\n"
-            "Respond with absolute minimum latency. Deliver direct, punchy answers in 1-2 short sentences. "
-            "Never use preamble, filler, or long explanations unless specifically asked.\n\n"
+            "[MANDATORY PROTOCOL]\n"
+            "1. ALWAYS ANSWER: You MUST respond to every question, request, or prompt from the user without exception.\n"
+            "2. CONCISE & FAST: Deliver direct, helpful answers in 1-2 punchy sentences with minimal latency.\n"
+            "3. NO DUPLICATE REPETITIONS: Do not repeat your own previous answer or re-greet unless asked.\n\n"
         )
 
         parts = [time_ctx, identity_ctx, speed_ctx]
@@ -784,11 +791,8 @@ class TokyoLive:
             ),
         )
         if self._enhanced_live:
-            # Affective dialog: TOKYO hears tone/emotion and adapts its voice.
-            # Proactive audio: TOKYO stays silent when speech isn't addressed
-            # to it (background chatter, talking to someone else in the room).
+            # Affective dialog: adapts tone naturally to user emotion
             cfg["enable_affective_dialog"] = True
-            cfg["proactivity"] = types.ProactivityConfig(proactive_audio=True)
         return types.LiveConnectConfig(**cfg)
 
     def _tool_done(self, fc, name, result) -> types.FunctionResponse:
@@ -1047,9 +1051,12 @@ class TokyoLive:
         loop = asyncio.get_event_loop()
 
         def callback(indata, frames, time_info, status):
+            now = time.monotonic()
             with self._speaking_lock:
                 tokyo_speaking = self._is_speaking
-            if not tokyo_speaking and not self.ui.muted and not self._phone_active:
+                last_spoke     = self._last_spoke_time
+            # Discard microphone audio for 0.45s after Tokyo speaks to eliminate room echo / feedback loops
+            if not tokyo_speaking and not self.ui.muted and not self._phone_active and (now - last_spoke > 0.45):
                 data = indata.tobytes()
                 loop.call_soon_threadsafe(
                     self.out_queue.put_nowait,
@@ -1133,6 +1140,7 @@ class TokyoLive:
 
                             full_out = " ".join(out_buf).strip()
                             if full_out:
+                                self._last_assistant_response = full_out
                                 self.ui.write_log(f"{self._asst_name}: {full_out}")
                                 self._session_log.append(f"{self._asst_name}: {full_out}")
                                 if self._dashboard:
@@ -1295,8 +1303,7 @@ class TokyoLive:
             "Output ONLY the summary text, nothing else:\n\n" + convo
         )
         try:
-            from google import genai as _genai
-            client = _genai.Client(api_key=_get_api_key())
+            client = genai.Client(api_key=_get_api_key())
             resp   = await asyncio.to_thread(
                 client.models.generate_content,
                 model="gemini-flash-latest",
